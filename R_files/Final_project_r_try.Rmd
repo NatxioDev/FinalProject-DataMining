@@ -14,6 +14,26 @@ load(url("https://github.com/AlvaroLimber/MD_UCB/raw/main/eh21.RData"))
 library(cluster) # medoides
 library(Kmedians) # medianas
 library(factoextra)
+library(dplyr)
+inter <- eh21p %>% mutate(ihogar=(s03c_17aa == 1)) %>% mutate(jefe = (s01a_05 == 1)) %>% group_by( s01a_02) %>%
+    filter(jefe == T) %>% select (  s01a_02)#jefe, folio, ihogar, s01a_02 
+table(inter)
+bds<-scale(inter)
+
+#factores: campo-ciudad   ganancias    edad     tipo de casa? 
+
+
+
+#set.seed(824)
+m1<-kmeans(bds,2)# comando de origen
+m1
+m1$centers
+m1$cluster
+
+table(kmeans(bds,2)$cluster)
+
+
+
 
 
 ```
