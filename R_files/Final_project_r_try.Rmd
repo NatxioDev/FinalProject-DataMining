@@ -45,8 +45,8 @@ inner_join(dataY)  %>% inner_join(dataX) %>% group_by(folio) %>% na.omit()# %>%
 
 
 dataProject <- dataProject[,-1]
-sqrt(dataProject)
-dataProject <- scale(dataPro)
+# sqrt(dataProject)
+# dataProject <- scale(dataPro)
 
 hist(log(dataProject$aestudio))
 barplot(table(eh21p$aestudio))
@@ -66,56 +66,56 @@ lillie.test(e)
 
 plot(density(e))
 curve(dnorm(x, 0, sd(e)), add=T, col="red")
-?curve()
-
-
-m2 <- lm(log(s01a_02) ~ factor(depto)  +pind+ luz+
-           campo + est +sueldo + agua+dis, data= dataProject)
-
-summary(m2)
-coefficients(m2)
-e2<- residuals(m2)
-
-summary(e2)
-hist(e2) 
-ad.test(e2)
-lillie.test(e2)
-
-plot(density(e2))
-curve(dnorm(x, 0, sd(e2)), add=T, col ="red")
-
-
-cooks.distance(m2)
-plot(cooks.distance(m2))
-
-summary(cooks.distance(m2))
-table(is.na(cooks.distance(m2)))
-
-quantil <- quantile(cooks.distance(m2), c(0.90), na.rm = T) 
-aux1 <- dataProject %>% filter (cooks.distance(m2) <= quantil[[1]]) 
-
-m3  <- lm(log(s01a_02) ~ factor(depto)  +pind+ luz+
-           campo + est +sueldo + agua+dis, data= dataProject)
-
-summary(m3)
-coefficients(m3)
-e3<- residuals(m3)
-
-library(car)
-vv<-vif(m3)
-sqrt(vv[,1])
-
-
-summary(e3)
-hist(e3) 
-ad.test(e3)
-lillie.test(e3)
-
-plot(density(e3))
-curve(dnorm(x, 0, sd(e3)), add=T, col ="red")
-library(lmtest)
-bptest(m3)
-
+# ?curve()
+# 
+# 
+# m2 <- lm(log(s01a_02) ~ factor(depto)  +pind+ luz+
+#            campo + est +sueldo + agua+dis, data= dataProject)
+# 
+# summary(m2)
+# coefficients(m2)
+# e2<- residuals(m2)
+# 
+# summary(e2)
+# hist(e2) 
+# ad.test(e2)
+# lillie.test(e2)
+# 
+# plot(density(e2))
+# curve(dnorm(x, 0, sd(e2)), add=T, col ="red")
+# 
+# 
+# cooks.distance(m2)
+# plot(cooks.distance(m2))
+# 
+# summary(cooks.distance(m2))
+# table(is.na(cooks.distance(m2)))
+# 
+# quantil <- quantile(cooks.distance(m2), c(0.90), na.rm = T) 
+# aux1 <- dataProject %>% filter (cooks.distance(m2) <= quantil[[1]]) 
+# 
+# m3  <- lm(log(s01a_02) ~ factor(depto)  +pind+ luz+
+#            campo + est +sueldo + agua+dis, data= dataProject)
+# 
+# summary(m3)
+# coefficients(m3)
+# e3<- residuals(m3)
+# 
+# library(car)
+# vv<-vif(m3)
+# sqrt(vv[,1])
+# 
+# 
+# summary(e3)
+# hist(e3) 
+# ad.test(e3)
+# lillie.test(e3)
+# 
+# plot(density(e3))
+# curve(dnorm(x, 0, sd(e3)), add=T, col ="red")
+# library(lmtest)
+# bptest(m3)
+# 
 
 
 
