@@ -26,7 +26,7 @@ load(url("https://github.com/AlvaroLimber/MD_UCB/raw/main/eh21.RData"))
 dataY <- eh21di%>% mutate(dis = (s10a_01c == 1)) %>%
   select(folio,dis, s10a_01c) 
 
-dataX <- eh21v %>%mutate (luz = (s07a_16 == 2) , agua =(s07a_10 == 7 | s07a_10 == 8),
+dataX <- eh21v %>%mutate (luz = (s07a_16 == 2) , agua =(s07a_16 == 7 | s07a_10 == 8),
                            material = (s07a_03 == 2 | s07a_03 ==6))%>% 
   select(folio, s07a_01, agua, luz,material, s07a_16, s07a_10, s07a_03)
 
@@ -45,16 +45,15 @@ inner_join(dataY)  %>% inner_join(dataX) %>% group_by(folio) %>% na.omit()# %>%
 
 
 dataProject <- dataProject[,-1]
+sqrt(dataProject)
+dataProject <- scale(dataPro)
 
-correlations <- cor(dataProject)              
-corrplot(correlations, method="number", order="hclust", type="lower")
+hist(log(dataProject$aestudio))
+barplot(table(eh21p$aestudio))
 
 
-
-
-m1 <- lm(s01a_02 ~ ylab  +factor(aestudio)+factor(area) +
-           s01a_03+factor(s07a_10)+factor(s01a_09)+ dis+factor(s07a_16)+
-           sueldo + luz, data= dataProject)
+m1 <- lm(aestudio ~ factor(s07a_10)+ylab  +s01a_02+sueldo+factor(area) +
+           s01a_03+factor(s01a_09)+factor(s07a_16), data= dataProject)
 
 summary(m1)
 coefficients(m1)
@@ -66,7 +65,7 @@ ad.test(e)
 lillie.test(e)
 
 plot(density(e))
-curve(dnorm(x, 0, sd(e)), add=T, col ="red")
+curve(dnorm(x, 0, sd(e)), add=T, col="red")
 ?curve()
 
 
