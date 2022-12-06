@@ -44,8 +44,85 @@ barplot(table(eh21p$aestudio))
 
 # m1 <- lm(aestudio ~ factor(s07a_10)+ylab  +s01a_02+sueldo+factor(area) +
 #            s01a_03+factor(s01a_09)+factor(s07a_16), data= dataProject)
-m1 <- lm(aestudio ~ agua+sueldo  +s01a_02+factor(depto)+sueldo+campo +
+m1 <- lm(aestudio ~ agua+sueldo  +s01a_02+factor(depto)+campo +
            ed+factor(s01a_09)+luz+material, data= dataProject)
+
+#analisis
+summary(m1)
+coefficients(m1)
+e<- residuals(m1)
+
+summary(e)
+hist(e) 
+
+#plot residuals e modelo 1
+plot(density(e))
+curve(dnorm(x, 0, sd(e)), add=T, col="red")
+
+vv<-vif(m1)
+sqrt(vv[,1])
+
+#test normalidad
+ad.test(e)
+lillie.test(e)
+bptest(m1)
+
+m2 <- lm(log(aestudio+10) ~ agua+sueldo  +s01a_02+factor(depto)+campo +
+           ed+factor(s01a_09)+luz+material, data= dataProject)
+summary(m2)
+coefficients(m2)
+e2<- residuals(m2)
+
+summary(e2)
+hist(e2)
+ad.test(e2)
+lillie.test(e2)
+
+plot(density(e2))
+curve(dnorm(x, 0, sd(e2)), add=T, col ="red")
+
+
+cooks.distance(m2)
+plot(cooks.distance(m2))
+
+summary(cooks.distance(m2))
+table(is.na(cooks.distance(m2)))
+
+quantil <- quantile(cooks.distance(m2), c(0.90), na.rm = T)
+aux1 <- dataProject %>% filter (cooks.distance(m2) <= quantil[[1]])
+
+m3  <- lm(log(aestudio+10) ~ agua+sueldo  +s01a_02+factor(depto)+campo +
+           ed+factor(s01a_09)+luz+material, data= aux1)
+
+summary(m3)
+coefficients(m3)
+e3<- residuals(m3)
+
+library(car)
+vv<-vif(m3)
+sqrt(vv[,1])
+
+
+summary(e3)
+hist(e3)
+ad.test(e3)
+lillie.test(e3)
+
+ad.test(residuals(m3))
+
+plot(density(e3))
+curve(dnorm(x, 0, sd(e3)), add=T, col ="red")
+library(lmtest)
+bptest(m3)
+
+
+```
+
+
+```{r}
+
+modelo11 <- lm(aestudio ~ factor(s07a_10)+ylab  +s01a_02+sueldo+factor(area) +
+           s01a_03+factor(s01a_09)+factor(s07a_16), data= dataProject)
 
 #analisis
 summary(m1)
@@ -114,9 +191,6 @@ plot(density(e3))
 curve(dnorm(x, 0, sd(e3)), add=T, col ="red")
 library(lmtest)
 bptest(m3)
-
-
-
-
 ```
+
 
