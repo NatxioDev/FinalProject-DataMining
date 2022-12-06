@@ -3,24 +3,71 @@ title: "DataMinningFinalProject"
 author: "Fabio Vaquera"
 date: "2022-11-30"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
+Determinantes de la discriminación utilizando la db eh21
+
 ```{r}
 rm(list = ls())
 library(dplyr)
+library(nortest)
 library(factoextra)
 library(haven)
 load(url("https://github.com/AlvaroLimber/MD_UCB/raw/main/eh21.RData"))
-#variables a utilizar: 
-# * vivienda (propia o no)
-# * area (rural)
-# * departamento de la paz, oruro y potosi 
-# * tiene luz? 
-# * material de la casa? 
-# * años de estudio 
 
-dataProject <- eh21v %>% select (depto, area) %>% filter(depto ==2 | depto == 5 | depto == 4) %>% 
-  filter(area == 1)
 
+dataY <- eh21di%>%
+  select(folio,s10a_01c) 
+
+dataX <- eh21v %>%select(folio, s07a_01, s07a_10, s07a_16)
+
+dataProject <- eh21p%>%
+  select (folio, s01a_10, s01a_09,aestudio, s01a_03, ylab,s01a_02, area ,depto) %>%
+inner_join(dataY)  %>% inner_join(dataX) %>% group_by(folio) %>% na.omit() #%>% 
+ # filter(aestudio < 12, ylab < 2000 , s01a_10 == 1, area == 2 )
+
+dataProject <- dataProject[,-1]
+m1 <- lm(s01a_02~ factor(depto) +s01a_10 + factor(s07a_01)+factor(s01a_09)+factor(s07a_16)+
+           area + aestudio +ylab, data= dataProject %>% filter(s10a_01c == 1))
+
+summary(m1)
+coefficients(m1)
+e<- residuals(m1)
+
+summary(e)
+hist(e) 
+ad.test(e)
+lillie.test(e)
+
+plot(density(e))
+curve(dnorm(x, 0, sd(e)), add=T, col ="red")
+
+
+m2 <- lm(log(s01a_02+10)~ factor(depto) +s01a_10 + factor(s07a_01)+factor(s01a_09)+factor(s07a_16)+
+           area + aestudio +ylab, data= dataProject %>% filter(s10a_01c == 1))
+
+summary(m2)
+coefficients(m2)
+e2<- residuals(m2)
+
+summary(e2)
+hist(e2) 
+ad.test(e2)
+lillie.test(e2)
+
+plot(density(e2))
+curve(dnorm(x, 0, sd(e2)), add=T, col ="red")
+
+
+cooks.distance(m2)
+plot(cooks.distance(m2))
+
+summary(cooks.distance(m2))
+table(is.na(cooks.distance(m2)))
+
+quantil <- quantile(cooks.distance(m2), c(0.90), na.rm = T) 
+aux1 <- dataProject %>% filter (cooks.distance(m2) <= quantil[[1]]) 
 
 
 
