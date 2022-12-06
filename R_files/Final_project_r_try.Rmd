@@ -14,22 +14,47 @@ library(dplyr)
 library(nortest)
 library(factoextra)
 library(haven)
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(corrplot) 
+
+
 load(url("https://github.com/AlvaroLimber/MD_UCB/raw/main/eh21.RData"))
 
 
-dataY <- eh21di%>%
-  select(folio,s10a_01c) 
+dataY <- eh21di%>% mutate(dis = (s10a_01c == 1)) %>%
+  select(folio,dis, s10a_01c) 
 
-dataX <- eh21v %>%select(folio, s07a_01, s07a_10, s07a_16)
+dataX <- eh21v %>%mutate (luz = (s07a_16 == 2) , agua =(s07a_10 == 7 | s07a_10 == 8),
+                           material = (s07a_03 == 2 | s07a_03 ==6))%>% 
+  select(folio, s07a_01, agua, luz,material, s07a_16, s07a_10, s07a_03)
 
-dataProject <- eh21p%>%
-  select (folio, s01a_10, s01a_09,aestudio, s01a_03, ylab,s01a_02, area ,depto) %>%
-inner_join(dataY)  %>% inner_join(dataX) %>% group_by(folio) %>% na.omit() #%>% 
- # filter(aestudio < 12, ylab < 2000 , s01a_10 == 1, area == 2 )
+dataProject <- eh21p%>% 
+  mutate (sueldo = (ylab<2500), est = (aestudio <12), pind = (s01a_09 == 1), 
+          campo = (area == 2), ed = (s01a_03 >= 15 )  ) %>%
+  select (folio, sueldo, est, pind, campo,s01a_09,
+          s01a_02,depto, aestudio, area, s01a_03, ylab ) %>%
+inner_join(dataY)  %>% inner_join(dataX) %>% group_by(folio) %>% na.omit()# %>%
+  # filter(aestudio < 12, ylab < 2000 , s01a_10 == 1, area == 2 )
+
+#agua no en cañeria 
+#sin luz 
+#para agregar
+ #factor(s07a_01)
+
 
 dataProject <- dataProject[,-1]
-m1 <- lm(s01a_02~ factor(depto) +s01a_10 + factor(s07a_01)+factor(s01a_09)+factor(s07a_16)+
-           area + aestudio +ylab, data= dataProject %>% filter(s10a_01c == 1))
+
+correlations <- cor(dataProject)              
+corrplot(correlations, method="number", order="hclust", type="lower")
+
+
+
+
+m1 <- lm(s01a_02 ~ ylab  +factor(aestudio)+factor(area) +
+           s01a_03+factor(s07a_10)+factor(s01a_09)+ dis+factor(s07a_16)+
+           sueldo + luz, data= dataProject)
 
 summary(m1)
 coefficients(m1)
@@ -42,10 +67,11 @@ lillie.test(e)
 
 plot(density(e))
 curve(dnorm(x, 0, sd(e)), add=T, col ="red")
+?curve()
 
 
-m2 <- lm(log(s01a_02+10)~ factor(depto) +s01a_10 + factor(s07a_01)+factor(s01a_09)+factor(s07a_16)+
-           area + aestudio +ylab, data= dataProject %>% filter(s10a_01c == 1))
+m2 <- lm(log(s01a_02) ~ factor(depto)  +pind+ luz+
+           campo + est +sueldo + agua+dis, data= dataProject)
 
 summary(m2)
 coefficients(m2)
@@ -69,11 +95,27 @@ table(is.na(cooks.distance(m2)))
 quantil <- quantile(cooks.distance(m2), c(0.90), na.rm = T) 
 aux1 <- dataProject %>% filter (cooks.distance(m2) <= quantil[[1]]) 
 
+m3  <- lm(log(s01a_02) ~ factor(depto)  +pind+ luz+
+           campo + est +sueldo + agua+dis, data= dataProject)
+
+summary(m3)
+coefficients(m3)
+e3<- residuals(m3)
+
+library(car)
+vv<-vif(m3)
+sqrt(vv[,1])
 
 
+summary(e3)
+hist(e3) 
+ad.test(e3)
+lillie.test(e3)
 
-
-
+plot(density(e3))
+curve(dnorm(x, 0, sd(e3)), add=T, col ="red")
+library(lmtest)
+bptest(m3)
 
 
 
