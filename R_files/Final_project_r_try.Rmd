@@ -117,7 +117,7 @@ bptest(m3)
 
 
 ```
-
+# Regresion utilizando datos sin dividirlos por especificaciones
 
 ```{r}
 
