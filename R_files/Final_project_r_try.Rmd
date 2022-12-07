@@ -8,6 +8,7 @@ editor_options:
 ---
 Determinantes de la discriminación utilizando la db eh21
 
+
 ```{r}
 rm(list = ls())
 library(dplyr)
