@@ -55,6 +55,7 @@ e<- residuals(m1)
 summary(e)
 hist(e) 
 
+
 #plot residuals e modelo 1
 plot(density(e))
 curve(dnorm(x, 0, sd(e)), add=T, col="red")
@@ -121,74 +122,74 @@ bptest(m3)
 
 ```{r}
 
-modelo11 <- lm(aestudio ~ factor(s07a_10)+ylab  +s01a_02+sueldo+factor(area) +
-           s01a_03+factor(s01a_09)+factor(s07a_16), data= dataProject)
+modelo11 <- lm(aestudio ~ factor(s07a_10)+ylab  +s01a_02+factor(area) +
+           factor(s01a_03)+factor(s01a_09)+factor(s07a_16), data= dataProject)
 
 #analisis
-summary(m1)
-coefficients(m1)
-e<- residuals(m1)
+summary(modelo11)
+coefficients(modelo11)
+em11<- residuals(modelo11)
 
-summary(e)
-hist(e) 
+summary(em11)
+hist(em11) 
 
 #plot residuals e modelo 1
-plot(density(e))
-curve(dnorm(x, 0, sd(e)), add=T, col="red")
+plot(density(em11))
+curve(dnorm(x, 0, sd(em11)), add=T, col="red")
 
-vv<-vif(m1)
+vv<-vif(modelo11)
 sqrt(vv[,1])
 
 #test normalidad
-ad.test(e)
-lillie.test(e)
-bptest(m1)
+ad.test(em11)
+lillie.test(em11)
+bptest(modelo11)
 
-m2 <- lm(log(aestudio+10) ~ agua+sueldo  +s01a_02+factor(depto)+sueldo+campo +
-           ed+factor(s01a_09)+luz+material, data= dataProject)
-summary(m2)
-coefficients(m2)
-e2<- residuals(m2)
+modelo12 <- lm(log(aestudio+10) ~ factor(s07a_10)+ylab  +s01a_02+factor(area) +
+           factor(s01a_03)+factor(s01a_09)+factor(s07a_16), data= dataProject)
+summary(modelo12)
+coefficients(modelo12)
+em2<- residuals(modelo12)
 
-summary(e2)
-hist(e2)
-ad.test(e2)
-lillie.test(e2)
+summary(em2)
+hist(em2)
+# ad.test(e2)
+# lillie.test(e2)
 
-plot(density(e2))
-curve(dnorm(x, 0, sd(e2)), add=T, col ="red")
+plot(density(em2))
+curve(dnorm(x, 0, sd(em2)), add=T, col ="red")
 
 
-cooks.distance(m2)
-plot(cooks.distance(m2))
+cooks.distance(modelo12)
+plot(cooks.distance(modelo12))
 
-summary(cooks.distance(m2))
-table(is.na(cooks.distance(m2)))
+summary(cooks.distance(modelo12))
+table(is.na(cooks.distance(modelo12)))
 
-quantil <- quantile(cooks.distance(m2), c(0.90), na.rm = T)
-aux1 <- dataProject %>% filter (cooks.distance(m2) <= quantil[[1]])
+quantil <- quantile(cooks.distance(modelo12), c(0.90), na.rm = T)
+aux11 <- dataProject %>% filter (cooks.distance(modelo12) <= quantil[[1]])
 
-m3  <- lm(log(aestudio+10) ~ agua+sueldo  +s01a_02+factor(depto)+sueldo+campo +
-           ed+factor(s01a_09)+luz+material, data= aux1)
+mod3  <- lm(log(aestudio+10) ~ factor(s07a_10)+ylab  +s01a_02+factor(area) +
+           factor(s01a_03)+factor(s01a_09)+factor(s07a_16), data= aux11)
 
-summary(m3)
-coefficients(m3)
-e3<- residuals(m3)
+summary(mod3)
+coefficients(mod3)
+em3<- residuals(mod3)
 
 library(car)
-vv<-vif(m3)
+vv<-vif(mod3)
 sqrt(vv[,1])
 
 
-summary(e3)
-hist(e3)
-ad.test(e3)
-lillie.test(e3)
+summary(em3)
+hist(em3)
+# ad.test(e3)
+# lillie.test(e3)
 
 ad.test(residuals(m3))
 
-plot(density(e3))
-curve(dnorm(x, 0, sd(e3)), add=T, col ="red")
+plot(density(em3))
+curve(dnorm(x, 0, sd(em3)), add=T, col ="red")
 library(lmtest)
 bptest(m3)
 ```
